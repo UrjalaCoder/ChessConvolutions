@@ -60,8 +60,6 @@ def evaluate(net, games, threshold=0.05, count=10):
         input_tensor = torch.tensor(input_arr).unsqueeze(dim=0).to(dtype=torch.float32)
         result = net(input_tensor)
         real_result = result[0].item()
-        # print(f"CORRECT_RESULT: {output_label}")
-        # print(f"PREDICTION: {real_result}")
         if abs(real_result - output_label) < threshold:
             correct_boards += 1
         else:
@@ -71,11 +69,16 @@ def evaluate(net, games, threshold=0.05, count=10):
     total = correct_boards + incorrect_boards
     print(f"{(correct_boards / total) * 100.0} %")
 
+def load_premade(filename="value"):
+    p = f"nets/{filename}.pth"
+    net.load_state_dict(torch.load(p))
 
-            
-evaluate(net, games, threshold=0.4, count=500)
-train(net, games, lr=1, bs_size=500, epochs=200)
-evaluate(net, games, threshold=0.4, count=500)
+load_premade()
+
+threshold = 0.4
+evaluate(net, games, threshold=threshold, count=500)
+# train(net, games, lr=1, bs_size=500, epochs=200)
+# evaluate(net, games, threshold=threshold, count=500)
 
 # Saving:
-torch.save(net.state_dict(), "nets/value.pth")
+# torch.save(net.state_dict(), "nets/value.pth")

@@ -43,6 +43,11 @@ class ChessNet(nn.Module):
         self.convd1 = nn.Conv2d(128, 128, kernel_size=(1, 1))
         self.convd2 = nn.Conv2d(128, 128, kernel_size=(1, 1))
         self.convd3 = nn.Conv2d(128, 128, kernel_size=(1, 1))
+        
+        # 128x1x1 -> 128x1x1
+        #self.conve1 = nn.Conv2d(128, 128, kernel_size=(1, 1))
+        #self.conve2 = nn.Conv2d(128, 128, kernel_size=(1, 1))
+        #self.conve3 = nn.Conv2d(128, 128, kernel_size=(1, 1))
 
         self.tanh = nn.Tanh()
 
@@ -69,6 +74,11 @@ class ChessNet(nn.Module):
         result = F.relu(self.convd1(result))
         result = F.relu(self.convd2(result))
         result = F.relu(self.convd3(result))
+            
+        # Result is 256x1x1
+        #result = F.relu(self.conve1(result))
+        #result = F.relu(self.conve2(result))
+        #result = F.relu(self.conve3(result))
 
         result = result.view(-1, 128)
         result = self.linear(result)
