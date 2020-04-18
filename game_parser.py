@@ -9,6 +9,14 @@ TEST_FILENAME = "ficsgamesdb_2019_standard2000_nomovetimes_123895.pgn"
 def load_game_file(path=TEST_FILENAME):
     return open(f"raw_data/{path}", encoding="utf-8-sig")
 
+def generate_training_dataset(games):
+    boards = []
+    for game in games:
+        for board in game:
+            boards.append(board)
+    boards = np.array(boards)
+    return boards
+
 def get_game_boards(game_count=100):
 
     def get_game_serialization(moves, result):
@@ -65,7 +73,9 @@ def load(filename="data"):
     return np.load(f"datasets/{filename}.npy", allow_pickle=True)
 
 def parse_and_save():
-    boards = get_game_boards()
+    games = get_game_boards()
+    boards = generate_training_dataset(games)
+    # print(boards[0:5])
     save_games(boards)
 
 # parse_and_save()
