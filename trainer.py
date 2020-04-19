@@ -4,13 +4,12 @@ import torch
 from torch import optim
 import numpy as np
 import math
-import matplotlib.pyplot as plt
 
 games = load()
 # print(games[0:100])
-game = games[0]
-print(game)
-board = game[-1]
+#game = games[0]
+#print(game)
+#board = game[-1]
 net = ChessNet()
 
 def get_random_sample(arr, count=10):
@@ -81,13 +80,13 @@ def load_premade(filename="value"):
 
 #load_premade(filename="network2")
 
-threshold = 0.4
-evaluate(net, games, threshold=threshold, count=500)
-losses = train(net, games, lr=1, bs_size=512, epochs=300)
-evaluate(net, games, threshold=threshold, count=500)
+#threshold = 0.4
+#evaluate(net, games, threshold=threshold, count=500)
+losses = train(net, games, lr=1, bs_size=512, epochs=500)
+#evaluate(net, games, threshold=threshold, count=500)
 
 # Saving:
 torch.save(net.state_dict(), "nets/network3.pth")
 
-plt.plot(losses)
-plt.show()
+#plt.plot(losses)
+#plt.show()
