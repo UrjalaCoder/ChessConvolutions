@@ -1,8 +1,6 @@
-import chess.pgn
 import sys
 import numpy as np
 
-from state import State
 
 TEST_FILENAME = "ficsgamesdb_2019_standard2000_nomovetimes_123895.pgn"
 
@@ -18,7 +16,8 @@ def generate_training_dataset(games):
     return boards
 
 def get_game_boards(game_count=10000):
-
+    import chess.pgn
+    from state import State
     def get_game_serialization(moves, result):
         s = State()
         serializations = []
