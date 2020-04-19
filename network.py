@@ -87,6 +87,12 @@ class ChessNet(nn.Module):
     def loss(self, prediction, target):
         return self.lossF(prediction, target)
 
+def load_network():
+    n = ChessNet()
+    p = "nets/network2.pth"
+    n.load_state_dict(torch.load(p))
+    return n
+
 def main():
     in_width, in_height = 1, 1
     kernel_size = (1, 1)

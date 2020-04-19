@@ -32,22 +32,23 @@ def get_vectorset(games):
 def train(net, games, epochs=5, bs_size=10, lr=0.05):
     optimizer = optim.Adam(net.parameters())
     for epoch in range(epochs):
-        bs = get_random_sample(games, count=bs_size)
-        input_tensors, output_tensors = get_vectorset(bs)
         current_loss = 0
-        optimizer.zero_grad()
-        # Old loop
-        # To tensor
-        result = net(input_tensors)
-        # print(result)
+        for batch in range(20):
+            bs = get_random_sample(games, count=bs_size)
+            input_tensors, output_tensors = get_vectorset(bs)
+            optimizer.zero_grad()
+            # Old loop
+            # To tensor
+            result = net(input_tensors)
+            # print(result)
 
-        # Correct label
-        loss = net.loss(result, output_tensors)
-        current_loss += loss.item()
-        
-        loss.backward()
-        optimizer.step()
-        avg_loss = current_loss
+            # Correct label
+            loss = net.loss(result, output_tensors)
+            current_loss += loss.item()
+            
+            loss.backward()
+            optimizer.step()
+        avg_loss = current_loss / 20
         print(f"EPOCH: {epoch}, LOSS: {avg_loss}")
 
 def evaluate(net, games, threshold=0.05, count=10):
@@ -73,12 +74,12 @@ def load_premade(filename="value"):
     p = f"nets/{filename}.pth"
     net.load_state_dict(torch.load(p))
 
-load_premade()
+load_premade(filename="network2")
 
 threshold = 0.4
 evaluate(net, games, threshold=threshold, count=500)
-# train(net, games, lr=1, bs_size=500, epochs=200)
-# evaluate(net, games, threshold=threshold, count=500)
+#train(net, games, lr=1, bs_size=256, epochs=30)
+#evaluate(net, games, threshold=threshold, count=500)
 
 # Saving:
-# torch.save(net.state_dict(), "nets/value.pth")
+#torch.save(net.state_dict(), "nets/network2.pth")
