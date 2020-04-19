@@ -17,7 +17,7 @@ def generate_training_dataset(games):
     boards = np.array(boards)
     return boards
 
-def get_game_boards(game_count=100):
+def get_game_boards(game_count=10000):
 
     def get_game_serialization(moves, result):
         s = State()
@@ -32,6 +32,7 @@ def get_game_boards(game_count=100):
     games = []
     counter = 0
     while 1 and counter < game_count:
+        print(f"counter: {counter} / {game_count}")
         game = None
         try:
             game = chess.pgn.read_game(pgn_data)
@@ -41,7 +42,7 @@ def get_game_boards(game_count=100):
         moves = list(game.mainline_moves())
         #print(moves)
         result_str = game.headers['Result']
-        print(result_str)
+        # print(result_str)
         result = None
         # Parse result
         white, black = result_str.split('-')
@@ -49,7 +50,7 @@ def get_game_boards(game_count=100):
         if white == '1' and black == '0':
             result = 1
         elif white == '0' and black == '1':
-            print("WHITE LOST!")
+            # print("WHITE LOST!")
             result = -1
         elif white == '1/2' and black == '1/2':
             result = 0
@@ -75,7 +76,7 @@ def load(filename="data"):
 def parse_and_save():
     games = get_game_boards()
     boards = generate_training_dataset(games)
-    # print(boards[0:5])
+    print(len(boards))
     save_games(boards)
 
 # parse_and_save()

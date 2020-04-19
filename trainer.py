@@ -3,19 +3,21 @@ from game_parser import load
 import torch
 from torch import optim
 import numpy as np
+import math
+import matplotlib.pyplot as plt
 
 games = load()
 # print(games[0:100])
 game = games[0]
+print(game)
 board = game[-1]
-
 net = ChessNet()
 
 def get_random_sample(arr, count=10):
-    choice_indices = [i for i in range(len(arr))]
     choices = []
+    s = len(arr)
     for i in range(count):
-        index = np.random.choice(choice_indices)
+        index = math.floor(np.random.uniform() * s)
         choices.append(arr[index])
     return choices
 
@@ -31,6 +33,7 @@ def get_vectorset(games):
 
 def train(net, games, epochs=5, bs_size=10, lr=0.05):
     optimizer = optim.Adam(net.parameters())
+    losses = []
     for epoch in range(epochs):
         current_loss = 0
         for batch in range(20):
@@ -49,7 +52,9 @@ def train(net, games, epochs=5, bs_size=10, lr=0.05):
             loss.backward()
             optimizer.step()
         avg_loss = current_loss / 20
+        losses.append(avg_loss)
         print(f"EPOCH: {epoch}, LOSS: {avg_loss}")
+    return losses
 
 def evaluate(net, games, threshold=0.05, count=10):
     random_sample = get_random_sample(games, count=count)
@@ -74,12 +79,15 @@ def load_premade(filename="value"):
     p = f"nets/{filename}.pth"
     net.load_state_dict(torch.load(p))
 
-load_premade(filename="network2")
+#load_premade(filename="network2")
 
 threshold = 0.4
 evaluate(net, games, threshold=threshold, count=500)
-#train(net, games, lr=1, bs_size=256, epochs=30)
-#evaluate(net, games, threshold=threshold, count=500)
+losses = train(net, games, lr=1, bs_size=512, epochs=300)
+evaluate(net, games, threshold=threshold, count=500)
 
 # Saving:
-#torch.save(net.state_dict(), "nets/network2.pth")
+torch.save(net.state_dict(), "nets/network3.pth")
+
+plt.plot(losses)
+plt.show()

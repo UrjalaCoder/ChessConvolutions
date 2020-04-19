@@ -89,7 +89,7 @@ class ChessNet(nn.Module):
 
 def load_network():
     n = ChessNet()
-    p = "nets/network2.pth"
+    p = "nets/network3.pth"
     n.load_state_dict(torch.load(p))
     return n
 
