@@ -15,7 +15,7 @@ def generate_training_dataset(games):
     boards = np.array(boards)
     return boards
 
-def get_game_boards(board_count, date_print_iteration=1000):
+def get_game_boards(board_count, date_print_iteration=10):
     import chess.pgn
     from state import State
     def get_game_serialization(moves, result):
@@ -35,9 +35,8 @@ def get_game_boards(board_count, date_print_iteration=1000):
         "0-1": -1,
         "1/2-1/2": 0
     }
-    last_counter = 0
+    date_counter = 0
     while 1 and counter < board_count:
-        last_counter = counter
         print(f"counter: {counter} / {board_count}")
         game = None
         try:
@@ -47,9 +46,10 @@ def get_game_boards(board_count, date_print_iteration=1000):
             break
         moves = list(game.mainline_moves())
         result_str = game.headers['Result'].strip()
-        if counter // date_print_iteration != last_counter // date_print_iteration:
+        if date_counter % date_print_iteration == 0
             date_str = game.headers['Date'].strip()
             print(date_str)
+            date_counter = 0
         result = None
         # Parse result
         result = result_dict[result_str]
@@ -58,6 +58,7 @@ def get_game_boards(board_count, date_print_iteration=1000):
             serializations = np.array(get_game_serialization(moves, result))
             counter += len(serializations)
             games.append(serializations)
+        date_counter += 1
     return np.array(games)
 
 def save_games(games, filename="data"):
