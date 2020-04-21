@@ -46,7 +46,7 @@ def get_game_boards(board_count, date_print_iteration=10):
             break
         moves = list(game.mainline_moves())
         result_str = game.headers['Result'].strip()
-        if date_counter % date_print_iteration == 0
+        if date_counter % date_print_iteration == 0:
             date_str = game.headers['Date'].strip()
             print(date_str)
             date_counter = 0
