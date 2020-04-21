@@ -25,13 +25,27 @@ def get_vectorset(games):
     return (torch.tensor(input_tensors).to(dtype=torch.float32), torch.tensor(output_tensors).to(dtype=torch.float32))
 
 def train(net, games, epochs=5, bs_size=10, lr=0.05):
+    device_str = ("cuda:0" if torch.cuda.is_available() else "cpu")
+    print(f"Training on {device_str}")
+    device = torch.device(device_str)
     optimizer = optim.Adam(net.parameters())
     losses = []
+    
+    # Convert net to CUDA (if possible)
+    if device_str != "cpu":
+        net = net.to(device)
+
     for epoch in range(epochs):
         current_loss = 0
         for batch in range(20):
             bs = get_random_sample(games, count=bs_size)
             input_tensors, output_tensors = get_vectorset(bs)
+            
+            # CUDA support
+            if device_str != "cpu":
+                input_tensors = input_tensors.to(device)
+                output_tensors = output_tensors.to(device)
+
             optimizer.zero_grad()
             result = net(input_tensors)
             loss = net.loss(result, output_tensors)
