@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-
+import argparse
 
 TEST_FILENAME = "ficsgamesdb_2019_standard2000_nomovetimes_123895.pgn"
 
@@ -15,7 +15,7 @@ def generate_training_dataset(games):
     boards = np.array(boards)
     return boards
 
-def get_game_boards(game_count=10000):
+def get_game_boards(board_count):
     import chess.pgn
     from state import State
     def get_game_serialization(moves, result):
@@ -30,8 +30,13 @@ def get_game_boards(game_count=10000):
     pgn_data = load_game_file()
     games = []
     counter = 0
-    while 1 and counter < game_count:
-        print(f"counter: {counter} / {game_count}")
+    result_dict = {
+        "1-0": 1,
+        "0-1": -1,
+        "1/2-1/2": 0
+    }
+    while 1 and counter < board_count:
+        print(f"counter: {counter} / {board_count}")
         game = None
         try:
             game = chess.pgn.read_game(pgn_data)
@@ -39,25 +44,15 @@ def get_game_boards(game_count=10000):
             print("at the end!")
             break
         moves = list(game.mainline_moves())
-        #print(moves)
-        result_str = game.headers['Result']
-        # print(result_str)
+        result_str = game.headers['Result'].strip()
         result = None
         # Parse result
-        white, black = result_str.split('-')
-        #print()
-        if white == '1' and black == '0':
-            result = 1
-        elif white == '0' and black == '1':
-            # print("WHITE LOST!")
-            result = -1
-        elif white == '1/2' and black == '1/2':
-            result = 0
-        
+        result = result_dict[result_str]
+
         if result is not None:
             serializations = np.array(get_game_serialization(moves, result))
+            counter += len(serializations)
             games.append(serializations)
-        counter += 1
     return np.array(games)
 
 def save_games(games, filename="data"):
@@ -72,11 +67,20 @@ def save_games(games, filename="data"):
 def load(filename="data"):
     return np.load(f"datasets/{filename}.npy", allow_pickle=True)
 
-def parse_and_save():
-    games = get_game_boards()
-    boards = generate_training_dataset(games)
-    print(len(boards))
-    save_games(boards)
+def main():
+    parser = argparse.ArgumentParser("Chess game data parser")
+    parser.add_argument("filename", type=str, help="Filename to store the dataset")
+    parser.add_argument("board_count", type=int, help="Amount of boards to store")
+    
+    args = parser.parse_args()
+    
+    filename = args.filename
+    board_count = args.board_count
 
-# parse_and_save()
+    games = get_game_boards(board_count)
+    boards = generate_training_dataset(games)
+    save_games(boards, filename=filename)
+    
+if __name__ == "__main__":
+    main()
 

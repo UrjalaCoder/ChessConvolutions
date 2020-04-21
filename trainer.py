@@ -4,13 +4,7 @@ import torch
 from torch import optim
 import numpy as np
 import math
-
-games = load()
-# print(games[0:100])
-#game = games[0]
-#print(game)
-#board = game[-1]
-net = ChessNet()
+import argparse
 
 def get_random_sample(arr, count=10):
     choices = []
@@ -39,15 +33,9 @@ def train(net, games, epochs=5, bs_size=10, lr=0.05):
             bs = get_random_sample(games, count=bs_size)
             input_tensors, output_tensors = get_vectorset(bs)
             optimizer.zero_grad()
-            # Old loop
-            # To tensor
             result = net(input_tensors)
-            # print(result)
-
-            # Correct label
             loss = net.loss(result, output_tensors)
             current_loss += loss.item()
-            
             loss.backward()
             optimizer.step()
         avg_loss = current_loss / 20
@@ -74,19 +62,51 @@ def evaluate(net, games, threshold=0.05, count=10):
     total = correct_boards + incorrect_boards
     print(f"{(correct_boards / total) * 100.0} %")
 
-def load_premade(filename="value"):
+def load_premade(net, filename="network1"):
     p = f"nets/{filename}.pth"
     net.load_state_dict(torch.load(p))
+    return net
 
-#load_premade(filename="network2")
+def save_net(net, filename="network1"):
+    p = f"nets/{filename}.pth"
+    torch.save(net.state_dict(), p)
 
-#threshold = 0.4
-#evaluate(net, games, threshold=threshold, count=500)
-losses = train(net, games, lr=1, bs_size=512, epochs=500)
-#evaluate(net, games, threshold=threshold, count=500)
+def main():
+    parser = argparse.ArgumentParser(description="Network trainer and evaluator")
+    parser.add_argument("filename", type=str, help="Filename of file used for training/evaluation (without extension!)", default="network1")
+    
+    # Evaluation args
+    parser.add_argument("--threshold", type=float, help="Threshold for evaluation", default=1.0)
+    parser.add_argument("--count", type=int, help="Evaluation board count", default=10)
+    
+    # Training args
+    parser.add_argument("--train", type=bool, help="Train the network", default=False)
+    parser.add_argument("--bs", type=int, help="Batch size for training", default=0)
+    parser.add_argument("--epochs", type=int, help="Epoch count for training", default=0)
+    parser.add_argument("--dataset", type=str, help="Dataset used for training", default="data") 
 
-# Saving:
-torch.save(net.state_dict(), "nets/network3.pth")
+    args = parser.parse_args()
+    dataset_name = args.dataset
+    
+    games = load(filename=dataset_name)
 
-#plt.plot(losses)
-#plt.show()
+    filename = args.filename
+    training = args.train
+    if training is True:
+        bs = args.bs
+        epochs = args.epochs
+        print("Training the network...")
+        print(f"Dataset {dataset_name}, size: {len(games)}")
+        net = ChessNet()
+        train(net, games, epochs=epochs, bs_size=bs)
+        np.save
+    else:
+        threshold = args.threshold
+        count = args.count
+        print("Evaluating the network...")
+        net = ChessNet()
+        net = load_premade(net, filename=filename)
+        evaluate(net, games, threshold=threshold, count=count)
+
+if __name__ == "__main__":
+    main()
